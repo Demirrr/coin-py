@@ -3,11 +3,11 @@ CoinPy is an open-source project for making cryptocurrency available for everyon
 
 ## Installation
 ```bash
-pip install coinpy
+pip install coin-py
 ```
 Installation from source
 ```bash
-git clone https://github.com/Demirrr/coinpy
+git clone https://github.com/Demirrr/coin-py
 # To develop
 pip install -e .[dev]
 python -m pytest tests
