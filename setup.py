@@ -5,13 +5,18 @@ with open('README.md', 'r') as fh:
 
 setup(
     name='coinpy',
-    description='',
+    description='CoinPy is an open-source project for making cryptocurrency available for everyone.',
     version='0.0.1',
     packages=find_packages(exclude=('tests', 'test.*', 'examples.*')),
     install_requires=['pandas',
-                      'cbpro'],
+                      'cbpro',
+                      'matplotlib',
+                      'pytest'
+                      ],
+    extras_require={"dev": ["pytest>= 3.7"]},
     author='Caglar Demir',
     author_email='caglardemir8@gmail.com',
+    url='https://github.com/Demirrr/coinpy',
     classifiers=[
         "Programming Language :: Python :: 3.8.5",
         "License :: OSI Approved :: MIT License", ],

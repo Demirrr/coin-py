@@ -1,0 +1,1 @@
+from coinpy import Collector

@@ -3,7 +3,8 @@ import datetime
 from typing import List, Any, Union
 import pandas as pd
 import matplotlib.pyplot as plt
-import numpy as np 
+import numpy as np
+
 pd.options.display.max_columns = None
 
 
@@ -192,7 +193,6 @@ def compute_pv(df, allocs, money):
     data_frame *= money
     data_frame['PV'] = data_frame.sum(axis=1)
     return data_frame
-
 
 
 def softmax(s):
