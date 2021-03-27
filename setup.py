@@ -13,14 +13,14 @@ setup(
                       'matplotlib',
                       'pytest'
                       ],
-    extras_require={"dev": ["pytest>= 3.7"]},
+    extras_require={"dev": ["pytest>= 3.7.3"]},
     author='Caglar Demir',
     author_email='caglardemir8@gmail.com',
     url='https://github.com/Demirrr/coin-py',
     classifiers=[
-        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.7",
         "License :: OSI Approved :: MIT License"],
-    python_requires='>=3.8.5',
+    python_requires='>=3.7.3',
     long_description=long_description,
     long_description_content_type="text/markdown",
 )

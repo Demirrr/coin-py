@@ -51,7 +51,6 @@ class Collector:
             # get all products
             for i in self.__public_client.get_products():
                 id_prod = i['id']
-                # @TODO Multiprocessing
                 df = self.fetch(id_prod=id_prod,granularity=granularity)
                 df.to_csv(f'{full_path}/{id_prod}.csv')
                 print(f'{id_prod} saved.')

@@ -9,7 +9,7 @@ Installation from source
 ```bash
 git clone https://github.com/Demirrr/coin-py
 # To develop
-pip install -e .[dev]
+python pip install -e
 python -m pytest tests
 ```
 

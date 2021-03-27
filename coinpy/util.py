@@ -33,12 +33,13 @@ def plot(data_frame, title='Default'):
     plt.show()
 
 
-def create_experiment_folder(folder_name):
-    if folder_name is None:
-        folder_name = 'Data'
-    directory = os.getcwd() + '/' + folder_name + '/'
+def create_experiment_folder(directory):
+    if directory is None:
+        directory = os.getcwd() + '/' + 'Data'
+    else:
+        directory += '/' + 'Data'
     folder_name = str(datetime.datetime.now())
-    path_of_folder = directory + folder_name
+    path_of_folder = directory + '/' + folder_name
     os.makedirs(path_of_folder)
     return path_of_folder
 
@@ -64,10 +65,10 @@ def data_per_day_collector(data_day_path: str, cryptos: List):
         try:
             # Time intervals must be same
             assert (df_temp.index == df_collect.index).all()
-        except AssertionError:
+            df_collect = df_collect.join(df_temp)
+        except :
             print(p, 'will be ignored')
-            continue
-        df_collect = df_collect.join(df_temp)
+            raise ValueError
 
     return df_collect
 
@@ -175,11 +176,9 @@ def compute_weighted_price(data_frame, c):
     return data_frame
 
 
-def get_all_data(cryptos):
-    days = ['Data/' + i + '/' for i in os.listdir('Data')]
-    df = data_per_days_collector(data_days_path=days,
-                                 cryptos=cryptos)
-    return df
+def get_all_data(cryptos, path):
+    days = [path + '/' + i + '/' for i in os.listdir(path)]
+    return data_per_days_collector(data_days_path=days, cryptos=cryptos)
 
 
 def compute_allocation(df, allocs):
