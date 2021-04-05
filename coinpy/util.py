@@ -4,6 +4,7 @@ from typing import List, Any, Union
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import json
 
 pd.options.display.max_columns = None
 
@@ -66,28 +67,42 @@ def data_per_day_collector(data_day_path: str, cryptos: List):
             # Time intervals must be same
             assert (df_temp.index == df_collect.index).all()
             df_collect = df_collect.join(df_temp)
-        except :
+        except:
             print(p, 'will be ignored')
-            raise ValueError
 
     return df_collect
 
 
-def data_per_days_collector(data_days_path: List[str], cryptos: List):
+def load_csv(path):
+    """
+    If a csv file exist read it and return true
+    otherwise return tuple of Nones
+    :param path:
+    :return:
+    """
+    try:
+        return pd.read_csv(path, index_col='time', parse_dates=True), True
+    except FileNotFoundError:
+        # print(f'File not Found => {path}')
+        return None, None
+
+
+def collect_dataframes(paths: List[str], data: str):
     """
 
-    :param data_days_path:
-    :param cryptos:
+    :param paths:
+    :param data:
     :return:
     """
 
-    df = data_per_day_collector(data_days_path[0], cryptos)
-    for i in data_days_path[1:]:
-        df_temp = data_per_day_collector(i, cryptos)
-        df = df.append(df_temp)
+    results = (load_csv(path=i + '/' + data + '.csv') for i in paths)
+    dfs = (df for df, flag in results if flag)
+    df = next(dfs)
 
-    df = df.sort_values(by=['time'])
-    return df
+    for i in dfs:
+        df = df.append(i)
+
+    return df.sort_values(by=['time'])
 
 
 def bollinger_bands(data_frame, window_size=10, standard_variation=2.0):
@@ -176,9 +191,17 @@ def compute_weighted_price(data_frame, c):
     return data_frame
 
 
-def get_all_data(cryptos, path):
-    days = [path + '/' + i + '/' for i in os.listdir(path)]
-    return data_per_days_collector(data_days_path=days, cryptos=cryptos)
+def get_all_folders(path):
+    """
+
+    :param path:
+    :return:
+    """
+    return [path + '/' + i for i in os.listdir(path)]
+
+
+def get_all_data(data, path):
+    return collect_dataframes(paths=get_all_folders(path), data=data)
 
 
 def compute_allocation(df, allocs):
@@ -199,3 +222,8 @@ def softmax(s):
     exp_scores = np.exp(s)
     probs = exp_scores / np.sum(exp_scores, axis=1, keepdims=True)
     return probs
+
+
+def load_json(p):
+    with open(p, 'r') as file_descriptor:
+        return json.load(file_descriptor)
