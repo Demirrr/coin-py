@@ -20,6 +20,7 @@ for k, v in res.items():
 
         seen.add(k + '_' + kk)
         seen.add(kk + '_' + k)
+        # Compute pairwise Pearson correlation coefficient: P(X,Y) = Covariance(X,Y) / (std_X * std_Y)
         corr_res[k + '_' + kk] = v.corr(vv)
 
 with open("../ProcessedData/corr_coin.json", "w") as outfile:
