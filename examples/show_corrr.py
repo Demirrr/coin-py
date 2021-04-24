@@ -3,7 +3,7 @@ from coinpy.util import *
 import pandas as pd
 import matplotlib.pyplot as plt
 
-analyser = Analyser(path_correlation='../Data/corr_coin.json')
+analyser = Analyser(path_correlation='../ProcessedData/corr_coin.json')
 
 n = 3
 for i in analyser.max_n_corr(n):

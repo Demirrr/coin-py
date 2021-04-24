@@ -5,10 +5,10 @@ pd.options.display.max_columns = None
 
 res = dict()
 for i in get_all_folders('../ProcessedData'):
-    df = pd.read_csv(i, index_col='time', parse_dates=True)
-    suffix = i[i.rfind('/') + 1:-4]
-    res[suffix] = df[['low_' + suffix, 'high_' + suffix]].mean(axis=1)
-
+    if 'csv' in i :
+        df = pd.read_csv(i, index_col='time', parse_dates=True)
+        suffix = i[i.rfind('/') + 1:-4]
+        res[suffix] = df[['low_' + suffix, 'high_' + suffix]].mean(axis=1)
 corr_res = dict()
 seen = set()
 for k, v in res.items():
@@ -22,5 +22,5 @@ for k, v in res.items():
         seen.add(kk + '_' + k)
         corr_res[k + '_' + kk] = v.corr(vv)
 
-with open("../Data/corr_coin.json", "w") as outfile:
+with open("../ProcessedData/corr_coin.json", "w") as outfile:
     json.dump(corr_res, outfile, indent=4)
