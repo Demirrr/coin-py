@@ -1,18 +1,11 @@
 import coinpy as cp
-import matplotlib.pyplot as plt
 
-coins = ['BTC-USD', 'ETH-USD', 'UNI-USD']
-dfs = cp.DataFramesHolder(coins=coins, path='../ProcessedData')
-df = dfs.pipeline([
-    {'rename_coins': ['BTC', 'ETH', 'UNI']},
-    {'rename_columns': ['low', 'high', 'open', 'close', 'volume']},
-    {'preprocess': {'func': 'mean', 'input': ['open', 'close'], 'output': 'price'}},
-    {'select_frames': ['UNI', 'BTC']},
-    {'select': ['price']}
-
-])
-del dfs
-df.normalize()
-df.drop_rows_with_na()
-df.compute_portfolio_value(allocation=[.7, .3])
-print(df)
+dfs = cp.DataFramesHolder(path='../Data')
+dfs.preprocess({'func': 'mean', 'input': ['open', 'close'], 'output': 'price'})
+dfs.select_col(['price'])
+dfs.dropna()
+dfs.merge_frames(['ETH', 'BTC', 'ADA', 'XLM', 'UNI'])
+dfs.select_interval(start="2021-03-25", end="2021-04-20")
+dfs.normalize()
+dfs.portfolio_value(alloc=[.2, .2, .1, .3, .2])
+dfs.plot()

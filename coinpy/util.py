@@ -98,11 +98,15 @@ def collect_dataframes(paths: List[str], data: str):
     results = (load_csv(path=i + '/' + data + '.csv') for i in paths)
     dfs = (df for df, flag in results if flag)
     df = next(dfs)
-
+    df.columns = df.columns.str.replace('_' + data, '')
     for i in dfs:
+        # Remove the Tag from columns e.g. _BTC-USD.
+        i.columns = i.columns.str.replace('_' + data, '')
         df = df.append(i)
 
-    return df.sort_values(by=['time'])
+    df = df[~df.index.duplicated(keep='first')]
+    df = df.sort_values(by=['time'])
+    return df
 
 
 def bollinger_bands(data_frame, window_size=10, standard_variation=2.0):
@@ -187,7 +191,8 @@ def compute_weighted_price(data_frame, c):
     # Compute Price by averaging opening and closing price in 5 minutes interval.
     for i in c:
         data_frame[i] = (data_frame['open_' + i] + data_frame['close_' + i]) / 2.0
-        data_frame.drop(columns=['low_' + i, 'high_' + i, 'open_' + i, 'close_' + i, 'volume_' + i], inplace=True)
+        data_frame.drop_data_frames(columns=['low_' + i, 'high_' + i, 'open_' + i, 'close_' + i, 'volume_' + i],
+                                    inplace=True)
     return data_frame
 
 

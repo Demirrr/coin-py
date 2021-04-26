@@ -17,21 +17,23 @@ def fetch_files(args):
 
 
 def preprocessing(args):
-    if os.path.isfile(args.path_to_store):
-        """ Check if file exists"""
-    else:
+    try:
         os.mkdir(args.path_to_store)
-    # TODO do it in parallel
+    except FileExistsError:
+        """ File exists do not need to create a folder """
     for i in fetch_files(args):
         df = get_all_data(data=i, path=args.path)
+        # Remove suffix at saving
+        key = args.suffix.replace('.csv', '')
+        i = i.replace(key, '')
         df.to_csv(f'{args.path_to_store}/' + i + '.csv')
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--path", default='../Data',
+    parser.add_argument("--path", default='../FetchedData',
                         help='Path of folder containing fetch data. A fetch data corresponds to a folder containing coin related info in csv format')
     parser.add_argument("--path_to_store", default='../ProcessedData')
-    parser.add_argument("--suffix", default='-USD.csv')
+    parser.add_argument("--suffix", default='-USD.csv', help='Select only those files having input suffix.')
 
     preprocessing(parser.parse_args())
