@@ -1,12 +1,16 @@
 from .util import normalize_prices, get_all_folders, softmax
 import pandas as pd
 import numpy as np
+import scipy
+from scipy.optimize import minimize
 from functools import reduce
 from typing import List, Callable
 import matplotlib.pyplot as plt
 from collections import OrderedDict
 
 plt.style.use('seaborn-whitegrid')
+
+np.random.seed(1)
 
 
 class DataFrame:
@@ -322,6 +326,7 @@ class DataFramesHolder:
         for k, v in self.holder.items():
             v.plot(figsize=(12, 12))
         plt.legend()
+        plt.tight_layout()
         plt.show()
 
     def portfolio_value(self, coin_name=None, alloc=None) -> None:
@@ -331,24 +336,49 @@ class DataFramesHolder:
         else:
             self.holder[coin_name]['PV'] = (self.holder[coin_name] * alloc).sum(axis=1)
 
-    def optimize_portfolio_value(self, n=10, money=2, plot=True) -> None:
+    def optim_portfolio_value(self, n=10, money=1, method='SLSQP', plot=True) -> None:
         """
-        Optimize portfolio value by random sampling. (Monte Carlo ?)
+        Optimize portfolio value by random sampling.
+        :param method:
         :param n:
         :param money:
         :param plot:
         :return:
         """
 
+        def f(x):
+            return (df * x).sum(axis=1)[-1]
+
+        def neg_f(x):
+            return -(df * x).sum(axis=1)[-1]
+
         res = []
         # 1. Compute portfolio values with randomly sampled allocations.
         for coin_name, df in self:
             _, d = df.shape
-            X = softmax(np.random.randn(n * d).reshape((n, d)))
-            X *= money
-            for alloc in X:
-                last_pv = (df * alloc).sum(axis=1)[-1]
-                res.append((last_pv, coin_name, dict(zip(df.columns.tolist(), alloc)), len(df)))
+            alloc = None
+            last_pv = None
+
+            if method == 'Random':
+                X = softmax(np.random.randn(n * d).reshape((n, d)))
+                X *= money
+                for alloc in X:
+                    last_pv = f(alloc)
+            elif method == 'SLSQP':
+                # 1. Initial value
+                X_init = softmax(np.random.randn(d).reshape((1, d)))[0]
+                # 2. Constraint
+                constraints = ({'type': 'eq', 'fun': lambda x: 1.0 - np.sum(np.abs(x))})
+                # 3. Bounds => Required to have non negative values, min-max values
+                bounds = tuple((0.0, 1.0) for _ in X_init)
+                min_result = minimize(neg_f, X_init, method='SLSQP', bounds=bounds,
+                                      constraints=constraints,
+                                      options={'maxiter': n})
+                alloc = np.around(min_result.x, 3)
+                last_pv = f(alloc)
+            else:
+                raise ValueError()
+            res.append((last_pv, coin_name, dict(zip(df.columns.tolist(), alloc)), len(df)))
 
         # 2. Sort in descending order of portfolio values.
         res.sort(key=lambda x: x[0], reverse=True)

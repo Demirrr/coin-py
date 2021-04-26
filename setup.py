@@ -9,6 +9,7 @@ setup(
     version='0.0.1',
     packages=find_packages(exclude=('tests', 'test.*', 'examples.*')),
     install_requires=['pandas',
+                      'scipy',
                       'cbpro',
                       'matplotlib',
                       'pytest'
