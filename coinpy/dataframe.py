@@ -322,9 +322,12 @@ class DataFramesHolder:
         for k, v in self.holder.items():
             self.holder[k] = v.tail(n)
 
-    def plot(self):
-        for k, v in self.holder.items():
-            v.plot(figsize=(12, 12))
+    def plot(self, coin=None):
+        if coin == None:
+            for k, v in self.holder.items():
+                v.plot(figsize=(12, 12))
+        else:
+            self[coin].plot(figsize=(12, 12))
         plt.legend()
         plt.tight_layout()
         plt.show()
@@ -398,3 +401,42 @@ class DataFramesHolder:
         # 5. Plot it.
         if plot:
             self.plot()
+
+    def bollinger_bands(self, data_frame, window_size=50, standard_variation=2.0):
+        rolling_mean = self[data_frame].rolling(window=window_size).mean()
+        rolling_std = self[data_frame].rolling(window=window_size).std()
+
+        upper_band = rolling_mean + (rolling_std * standard_variation)
+        lower_band = rolling_mean - (rolling_std * standard_variation)
+
+        #self[data_frame]['rolling_mean']=rolling_mean
+        self[data_frame]['upper_band'] = upper_band
+        self[data_frame]['lower_band'] = lower_band
+
+        #return rolling_mean, (upper_band, lower_band)
+
+    def apply_bollinger_bands_on_normalized_values_given_time(self, dataframe,
+                                                              features=None,
+                                                              window_size=5,
+                                                              min_range=None,
+                                                              max_range=None):
+        assert features
+        if min_range is None and max_range is None:
+            min_range, max_range = dataframe.index.min(), dataframe.index.max()
+
+        dataframe = specific_time_range(dataframe, min_range=min_range, max_range=max_range)[features]
+
+        normalized_df = normalize_df(dataframe)
+        plot(normalized_df, title='Normalized prices in a given interval')
+
+        # 5 minutes 5 => 25 minutes
+        rolling_means, bands = bollinger_bands(normalized_df, window_size=window_size)
+        upper, lower = bands
+        for i in features:
+            normalized_df[i].plot(label=i)
+            upper[i].plot(label='Upper_Bound')
+            lower[i].plot(label='Lower_Bound')
+
+            plt.title('Bollinger bands')
+            plt.legend()
+            plt.show()

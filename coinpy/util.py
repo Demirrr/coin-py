@@ -109,56 +109,6 @@ def collect_dataframes(paths: List[str], data: str):
     return df
 
 
-def bollinger_bands(data_frame, window_size=10, standard_variation=2.0):
-    rolling_mean = data_frame.rolling(window=window_size).mean()
-    rolling_std = data_frame.rolling(window=window_size).std()
-
-    upper_band = rolling_mean + (rolling_std * standard_variation)
-    lower_band = rolling_mean - (rolling_std * standard_variation)
-
-    return rolling_mean, (upper_band, lower_band)
-
-
-def apply_bollinger_bands_on_normalized_values_given_time(dataframe,
-                                                          features=None,
-                                                          window_size=5,
-                                                          min_range=None,
-                                                          max_range=None):
-    assert features
-    if min_range is None and max_range is None:
-        min_range, max_range = dataframe.index.min(), dataframe.index.max()
-
-    dataframe = specific_time_range(dataframe, min_range=min_range, max_range=max_range)[features]
-
-    normalized_df = normalize_df(dataframe)
-    plot(normalized_df, title='Normalized prices in a given interval')
-
-    # 5 minutes 5 => 25 minutes
-    rolling_means, bands = bollinger_bands(normalized_df, window_size=window_size)
-    upper, lower = bands
-    for i in features:
-        normalized_df[i].plot(label=i)
-        upper[i].plot(label='Upper_Bound')
-        lower[i].plot(label='Lower_Bound')
-
-        plt.title('Bollinger bands')
-        plt.legend()
-        plt.show()
-
-
-def deprecated_compute_returns_from_scratch(data_frame, by=1):
-    """
-
-    :param data_frame:
-    :param by: indicates every 5 x by minutes
-    :return:
-    """
-
-    df_returns = data_frame.copy()
-    df_returns[by:] = (data_frame[by:] / data_frame[:-by].values) - 1
-    df_returns.iloc[0:by, :] = 0  # set daily returns for row 0 to 0
-    return df_returns
-
 
 def normalize_prices(data_frame):
     """
