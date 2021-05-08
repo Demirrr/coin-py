@@ -322,14 +322,15 @@ class DataFramesHolder:
         for k, v in self.holder.items():
             self.holder[k] = v.tail(n)
 
-    def plot(self, coin=None):
-        if coin == None:
+    def plot(self, coin=None,title=''):
+        if coin is None:
             for k, v in self.holder.items():
-                v.plot(figsize=(12, 12))
+                v.plot(figsize=(10, 10))
         else:
-            self[coin].plot(figsize=(12, 12))
+            self[coin].plot(figsize=(10, 10))
         plt.legend()
-        plt.tight_layout()
+        plt.title(title)
+        #plt.tight_layout()
         plt.show()
 
     def portfolio_value(self, coin_name=None, alloc=None) -> None:
@@ -409,11 +410,11 @@ class DataFramesHolder:
         upper_band = rolling_mean + (rolling_std * standard_variation)
         lower_band = rolling_mean - (rolling_std * standard_variation)
 
-        #self[data_frame]['rolling_mean']=rolling_mean
+        # self[data_frame]['rolling_mean']=rolling_mean
         self[data_frame]['upper_band'] = upper_band
         self[data_frame]['lower_band'] = lower_band
 
-        #return rolling_mean, (upper_band, lower_band)
+        # return rolling_mean, (upper_band, lower_band)
 
     def apply_bollinger_bands_on_normalized_values_given_time(self, dataframe,
                                                               features=None,

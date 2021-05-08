@@ -1,5 +1,5 @@
 """
-Fetch data related to coins and store them into data folder
+Organized daily fetched data into csv files based on crypto
 """
 from coinpy.util import get_all_folders, get_all_data
 import argparse
@@ -19,6 +19,8 @@ def fetch_files(args):
 def preprocessing(args):
     try:
         os.mkdir(args.path_to_store)
+        # if not os.path.exists(args.path_to_store):
+        #    os.makedirs(args.path_to_store)
     except FileExistsError:
         """ File exists do not need to create a folder """
     for i in fetch_files(args):
@@ -31,9 +33,8 @@ def preprocessing(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--path", default='../FetchedData',
+    parser.add_argument("--path",
                         help='Path of folder containing fetch data. A fetch data corresponds to a folder containing coin related info in csv format')
-    parser.add_argument("--path_to_store", default='../ProcessedData')
+    parser.add_argument("--path_to_store")
     parser.add_argument("--suffix", default='-USD.csv', help='Select only those files having input suffix.')
-
     preprocessing(parser.parse_args())
