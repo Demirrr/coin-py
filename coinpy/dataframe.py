@@ -100,12 +100,28 @@ class DataFramesHolder:
         for k, v in self.holder.items():
             yield k, v
 
+    def get_frame_names(self):
+        return list(self.holder.keys())
+
     def __getitem__(self, item):
         return self.holder[item]
+
+    @property
+    def values(self):
+        assert len(self.holder) == 1
+        _, v = self.holder.popitem()
+        return v
 
     def normalize(self):
         for k, v in self.holder.items():
             self.holder[k] = v / v.iloc[0]
+
+    def find(self, n=3, key=None, descending=True):
+        top = []
+        for k, v in self.holder.items():
+            top.append((k, key(v.values)))
+        top.sort(key=lambda tup: tup[1], reverse=descending)
+        return [top[_] for _ in range(n)]
 
     def dropna(self):
         for k, v in self.holder.items():
@@ -312,25 +328,55 @@ class DataFramesHolder:
         self.holder.clear()
         self.holder[names] = df
 
-    def select_interval(self, start, end=None):
+    def select_interval(self, start: str, end: str = None) -> None:
+        """
+        Given start and end, select only those dataframes that has values for such interval.
+        """
+        try:
+            assert isinstance(start, str)
+        except AssertionError:
+            print(f'Incorrect input param start: {start}')
+            exit(1)
+
+        keys_to_del = []
         for k, v in self.holder.items():
             if end is None:
                 end = v.index.max()
-            self.holder[k] = v[start:end]
+            if start in v.index:
+                self.holder[k] = v[start:end]
+            else:
+                keys_to_del.append(k)
+        for k in keys_to_del:
+            del self.holder[k]
 
     def select_last(self, n=12 * 24 * 7):
         for k, v in self.holder.items():
             self.holder[k] = v.tail(n)
 
-    def plot(self, coin=None,title=''):
+    def plot(self, coin=None, title='', start=None):
+        """
+        PLOT COINTS
+        :param coin:
+        :param title:
+        :param start:
+        :return:
+        """
         if coin is None:
             for k, v in self.holder.items():
-                v.plot(figsize=(10, 10))
+                if start:
+                    v = self[k].loc[start]
+                plt.plot(v, label=k)
         else:
-            self[coin].plot(figsize=(10, 10))
+            for c in coin:
+                if start:
+                    cm = self[c].loc[start]
+                else:
+                    cm = self[c]
+
+                plt.plot(cm, label=c)
         plt.legend()
         plt.title(title)
-        #plt.tight_layout()
+        # plt.tight_layout()
         plt.show()
 
     def portfolio_value(self, coin_name=None, alloc=None) -> None:
