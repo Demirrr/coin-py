@@ -30,6 +30,8 @@ def preprocessing(args):
     for df_to_insert, coin_csv_name in get_df_to_be_inserted(args.path_data_to_insert):
         df_main = get_main_df(args.path_main_data, coin_csv_name)
 
+
+
         try:
             df_main = df_main.append(df_to_insert, verify_integrity=True)
         except ValueError:
@@ -41,7 +43,9 @@ def preprocessing(args):
             os.mkdir(args.path_merged_data)
         except FileExistsError:
             """ File exists do not need to create a folder """
-
+        # .is_monotonic_increasing ? check whether index is monotonic increasing
+        if not df_main.index.is_monotonic_increasing:
+            df_main.sort_index(inplace=True)
         df_main.to_csv(args.path_merged_data + '/' + coin_csv_name)
 
 
@@ -49,6 +53,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--path_data_to_insert", default='../ProcessedData')
     parser.add_argument("--path_main_data", default='../Data')
-    parser.add_argument("--path_merged_data", default='../Data')
+    parser.add_argument("--path_merged_data", default='../MergedData')
 
     preprocessing(parser.parse_args())

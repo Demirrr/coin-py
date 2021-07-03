@@ -2,12 +2,22 @@ import coinpy as cp
 import numpy as np
 import pandas as pd
 
+# (1) Load all coins in
 dfs = cp.DataFramesHolder(path='../Data')
-dfs.drop_data_frames(key=lambda x: len(x) == 0)
+
+# [ETC ( 2021-02-20 10:55:00 -> 2021-07-02 15:20:00) : (36174, 5)]: low,	high,	open,	close,	volume]
+# --
+# [BTC ( 2021-02-20 10:55:00 -> 2021-07-02 15:15:00) : (36174, 5)]: low,	high,	open,	close,	volume]
+
+# (2) Create a new feature based on average of open and close
 dfs.preprocess({'func': 'mean', 'input': ['open', 'close'], 'output': 'price'})
+# (3) Select price
 dfs.select_col(['price'])
-dfs.dropna()
-dfs.merge_frames(['BTC', 'ADA', 'ETH', 'XLM', 'UNI'], how='inner')
+# (4) Select coins
+dfs.select_frames(['BTC', 'ADA', 'ETH', 'XLM', 'UNI'])
+# (5) Select Interval
 dfs.select_interval(start="2021-03-25")
+# (6) Normalize prices
 dfs.normalize()
-dfs.plot(title='Daily Returns')
+# (7) PLOT
+dfs.plot(title='Daily Returns', save='daily_returns')

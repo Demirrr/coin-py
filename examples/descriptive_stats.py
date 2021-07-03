@@ -3,14 +3,14 @@ import matplotlib.pyplot as plt
 import coinpy as cp
 
 dfs = cp.DataFramesHolder(path='../Data')
-dfs.drop_data_frames(key=lambda x: len(x) < 10)
 dfs.preprocess({'func': 'mean', 'input': ['open', 'close'], 'output': 'price'})
 dfs.sort_frames()
 dfs.select_col(['price'])
 dfs.dropna()
 
 flag_compute_betas = False
-flag_correlations= False
+flag_correlations = False
+flag_compute_returns = True
 
 
 def compute_betas():
@@ -50,9 +50,9 @@ if flag_correlations:
     for i, (c, info) in enumerate(corr[-10:]):
         print(f'{i + 1}. {info}')
 
-
-# Normalize prices
-dfs.normalize()
-print('Total return: ', dfs.find(key=lambda price: price[-1] - price[0]))
-print('Average return:', dfs.find(key=lambda price: price.mean()))
-print('Standard deviation return: ', dfs.find(key=lambda price: price.std()))
+if flag_compute_returns:
+    # Normalize prices
+    dfs.normalize()
+    print('Total return: ', dfs.find(n=10, key=lambda price: price[-1] - price[0], descending=True))
+    print('Average return:', dfs.find(n=10, key=lambda price: price.mean(), descending=True))
+    print('Standard deviation return: ', dfs.find(n=10, key=lambda price: price.std(), descending=True))

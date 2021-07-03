@@ -86,6 +86,8 @@ class DataFramesHolder:
         self.holder = self.read_csv(coins, path)
         # Test the order
         assert list(self.holder.keys()) == coins
+        print('Drop frames having less than 10 value')
+        self.drop_data_frames(key=lambda x: len(x) < 10)
 
     def __str__(self):
         m = ''
@@ -255,7 +257,11 @@ class DataFramesHolder:
     def read_csv(coins, path):
         results = dict()
         for c in coins:
-            results[c] = pd.read_csv(path + '/' + c + '.csv', index_col='time', parse_dates=True)
+            df = pd.read_csv(path + '/' + c + '.csv', index_col='time', parse_dates=True)
+            if not df.index.is_monotonic_increasing:
+                df.sort_index(inplace=True)
+            results[c] = df
+
         return results
 
     def rename_coins(self, names):
@@ -340,10 +346,12 @@ class DataFramesHolder:
 
         keys_to_del = []
         for k, v in self.holder.items():
-            if end is None:
-                end = v.index.max()
             if start in v.index:
-                self.holder[k] = v[start:end]
+                if end is None:
+                    self.holder[k] = v.loc[start:]
+                else:
+                    self.holder[k] = v[start:end]
+
             else:
                 keys_to_del.append(k)
         for k in keys_to_del:
@@ -353,9 +361,10 @@ class DataFramesHolder:
         for k, v in self.holder.items():
             self.holder[k] = v.tail(n)
 
-    def plot(self, coin=None, title='', start=None):
+    def plot(self, coin=None, title='', start=None,save=None):
         """
         PLOT COINTS
+        :param save:
         :param coin:
         :param title:
         :param start:
@@ -366,17 +375,22 @@ class DataFramesHolder:
                 if start:
                     v = self[k].loc[start]
                 plt.plot(v, label=k)
+                print(k)
         else:
+            assert isinstance(coin, list)
             for c in coin:
                 if start:
                     cm = self[c].loc[start]
                 else:
                     cm = self[c]
 
-                plt.plot(cm, label=c)
+                for column in cm:
+                    plt.plot(cm[column], label=column)
         plt.legend()
         plt.title(title)
-        # plt.tight_layout()
+        plt.tight_layout()
+        if save:
+            plt.savefig(save+'.png')
         plt.show()
 
     def portfolio_value(self, coin_name=None, alloc=None) -> None:
@@ -487,3 +501,12 @@ class DataFramesHolder:
             plt.title('Bollinger bands')
             plt.legend()
             plt.show()
+
+    def create_time_table(self):
+        df = None
+        for k, v in self.holder.items():
+            if df is None:
+                df = pd.DataFrame(data=v.values, index=v.index, columns=[k])
+            else:
+                df = pd.merge(df, pd.DataFrame(data=v.values, index=v.index, columns=[k]), on='time', how='outer')
+        return df
