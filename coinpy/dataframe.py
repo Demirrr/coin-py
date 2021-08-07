@@ -361,7 +361,7 @@ class DataFramesHolder:
         for k, v in self.holder.items():
             self.holder[k] = v.tail(n)
 
-    def plot(self, coin=None, title='', start=None,save=None):
+    def plot(self, coin=None, title='', start=None, save=None):
         """
         PLOT COINTS
         :param save:
@@ -390,15 +390,19 @@ class DataFramesHolder:
         plt.title(title)
         plt.tight_layout()
         if save:
-            plt.savefig(save+'.png')
+            plt.savefig(save + '.png')
         plt.show()
 
-    def portfolio_value(self, coin_name=None, alloc=None) -> None:
-        if coin_name is None:
-            for k, v in self.holder.items():
-                self.holder[k]['PV'] = (v * alloc).sum(axis=1)
-        else:
-            self.holder[coin_name]['PV'] = (self.holder[coin_name] * alloc).sum(axis=1)
+    def portfolio_value(self, coin_name=list, alloc=list) -> None:
+        pv = None
+        for cn, alloc_val in zip(coin_name, alloc):
+            if pv is None:
+                pv = self.holder[cn] * alloc_val
+            else:
+                pv = pv.merge(self.holder[cn] * alloc_val, left_index=True, right_index=True)
+
+
+        self.holder['PV'] = pv.sum(axis=1)
 
     def optim_portfolio_value(self, n=10, money=1, method='SLSQP', plot=True) -> None:
         """
