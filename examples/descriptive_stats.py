@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import coinpy as cp
 
 dfs = cp.DataFramesHolder(path='../Data')
+dfs.drop_data_frames(key=lambda x: len(x) < 5000)
 dfs.preprocess({'func': 'mean', 'input': ['open', 'close'], 'output': 'price'})
 dfs.sort_frames()
 dfs.select_col(['price'])
