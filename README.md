@@ -32,7 +32,7 @@ dfs.normalize()
 # (7) PLOT
 dfs.plot(title='Daily Returns', save='daily_returns')
 ```
-![image info](examples/daily_returns.png)
+![image info](examples/returns.png)
 ##### For more examples, please refer to examples folder
 
 ### Todos

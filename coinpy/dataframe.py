@@ -148,22 +148,36 @@ class DataFramesHolder:
         for i in coins:
             self.holder[i] = self.holder[i][cols]
 
-    def compute_returns(self, coin=None, interval='D'):
+    def __average_interval_return(self, *, coin: str, interval: str) -> np.float64:
+        """
+        Normalize prices and average them
 
-        if coin is None:
-            returns = []
+        :param coin: cryptocurrency
+        :param interval: Resample rule  pandas.DataFrame.resample.html#pandas-dataframe-resample
+        :return:
+        """
+        # (1) Normalize prices
+        normalized_prices = ( self[coin] / self[coin].iloc[0] ) - 1
+        # (2) Average results
+        averaged_normalized_prices = normalized_prices.resample(interval).mean()
+        return averaged_normalized_prices
+
+    def average_returns(self, coin=None, interval='D'):
+        """
+        :param coin:
+        :param interval: Downsample with Day (D), X Days (XD), X Minutes (XT)
+        :return:
+        """
+        if isinstance(coin, str):
+            return self.__average_interval_return(coin=coin, interval=interval)
+        elif isinstance(coin, list):
+            for k in coin:
+                yield k, self.__average_interval_return(coin=k, interval=interval)
+        elif coin is None:
             for (k, v) in self:
-                daily_prices = v.resample(interval).mean()
-                daily_prices[1:] = (daily_prices[1:] / daily_prices[:-1].values) - 1
-                daily_prices.iloc[0, :] = 0  # set daily return for row 0 to 0.
-                average_daily_return = daily_prices.mean().values[0]
-                returns.append((average_daily_return,
-                                f'Average return of {k} in {len(daily_prices)} interval = {average_daily_return:.3f}'))
-            returns.sort(key=lambda _: _[0], reverse=True)
-            for r, info in returns:
-                print(info)
+                yield k, self.__average_interval_return(coin=k, interval=interval)
         else:
-            print(self[coin])
+            raise KeyError(f'coin={coin} is not valid')
 
     @staticmethod
     def compute_return_df(df, interval='D') -> pd.DataFrame:
@@ -400,7 +414,6 @@ class DataFramesHolder:
                 pv = self.holder[cn] * alloc_val
             else:
                 pv = pv.merge(self.holder[cn] * alloc_val, left_index=True, right_index=True)
-
 
         self.holder['PV'] = pv.sum(axis=1)
 
