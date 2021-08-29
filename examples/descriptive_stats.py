@@ -6,10 +6,10 @@ dfs = cp.DataFramesHolder(path='../Data')
 # (2) Drop dataframes having length of less than 120 days
 dfs.drop_data_frames(key=lambda x: len(x) < 12 * 24 * 120)
 # (3) Create a feature based on the average value of open and close prices
-dfs.apply(feat_name='price', key=lambda df: (df['open'] + df['close']) / 2)
+dfs.create_feature(name='price', key=lambda df: (df['open'] + df['close']) / 2)
 # (4) Create a feature represent real volume
-dfs.apply(feat_name='real_volume', key=lambda df: df['price'] * df['volume'])
-dfs.apply(feat_name='norm_price', key=lambda df: df['price'] / df['price'][0])
+dfs.create_feature(name='real_volume', key=lambda df: df['price'] * df['volume'])
+dfs.create_feature(name='norm_price', key=lambda df: df['price'] / df['price'][0])
 dfs.sort_frames(key=lambda coin_name_and_df: coin_name_and_df[1]['real_volume'].mean())
 # [BTC ( 2021-02-20 10:55:00 -> 2021-08-28 15:20:00) : (52595, 8)]: low,	high,	open,	close,	volume,	price,	real_volume,	norm_price]
 # [ETH ( 2021-02-20 10:55:00 -> 2021-08-28 15:20:00) : (52627, 8)]: low,	high,	open,	close,	volume,	price,	real_volume,	norm_price]
