@@ -1,18 +1,23 @@
 import matplotlib.pyplot as plt
-
 import coinpy as cp
 
+# (1) Load dataframes holding low, high, open, close and volume of coins in 5 minutes interval
 dfs = cp.DataFramesHolder(path='../Data')
-dfs.drop_data_frames(key=lambda x: len(x) < 5000)
-dfs.preprocess({'func': 'mean', 'input': ['open', 'close'], 'output': 'price'})
-dfs.sort_frames()
+# (2) Drop dataframes having length of less than 120 days
+dfs.drop_data_frames(key=lambda x: len(x) < 12 * 24 * 120)
+# (3) Create a feature based on the average value of open and close prices
+dfs.apply(feat_name='price', key=lambda df: (df['open'] + df['close']) / 2)
+# (4) Create a feature represent real volume
+dfs.apply(feat_name='real_volume', key=lambda df: df['price'] * df['volume'])
+dfs.apply(feat_name='norm_price', key=lambda df: df['price'] / df['price'][0])
+dfs.sort_frames(key=lambda coin_name_and_df: coin_name_and_df[1]['real_volume'].mean())
+# [BTC ( 2021-02-20 10:55:00 -> 2021-08-28 15:20:00) : (52595, 8)]: low,	high,	open,	close,	volume,	price,	real_volume,	norm_price]
+# [ETH ( 2021-02-20 10:55:00 -> 2021-08-28 15:20:00) : (52627, 8)]: low,	high,	open,	close,	volume,	price,	real_volume,	norm_price]
+# [ADA ( 2021-03-18 16:05:00 -> 2021-08-28 15:20:00) : (44428, 8)]: low,	high,	open,	close,	volume,	price,	real_volume,	norm_price]
+# . . .
 dfs.select_col(['price'])
-dfs.dropna()
-
-flag_compute_betas = False
-flag_correlations = False
-flag_compute_returns = True
-
+flag_compute_betas = True
+flag_correlations = True
 
 def compute_betas():
     """
@@ -51,9 +56,3 @@ if flag_correlations:
     for i, (c, info) in enumerate(corr[-10:]):
         print(f'{i + 1}. {info}')
 
-if flag_compute_returns:
-    # Normalize prices
-    dfs.normalize()
-    print('Total return: ', dfs.find(n=10, key=lambda price: price[-1] - price[0], descending=True))
-    print('Average return:', dfs.find(n=10, key=lambda price: price.mean(), descending=True))
-    print('Standard deviation return: ', dfs.find(n=10, key=lambda price: price.std(), descending=True))
