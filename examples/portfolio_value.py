@@ -1,7 +1,7 @@
 import coinpy as cp
 
 dfs = cp.DataFramesHolder(path='../Data')
-dfs.preprocess({'func': 'mean', 'input': ['open', 'close'], 'output': 'price'})
+dfs.create_feature(name='price', key=lambda dataframe: (dataframe['open'] + dataframe['close']) / 2)
 dfs.select_col(['price'])
 dfs.dropna()
 dfs.select_frames(['BTC', 'ADA', 'ETH', 'XLM', 'UNI'])

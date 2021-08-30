@@ -116,12 +116,23 @@ class DataFramesHolder:
 
     def normalize(self):
         for k, v in self.holder.items():
-            self.holder[k] = v / v.iloc[0]
+            self.holder[k] = (v / v.iloc[0]) - 1
 
-    def find(self, n=3, key=None, descending=True):
+    def find(self, n=3, key=None, start: str = None, end: str = None, descending=True):
         top = []
         for k, v in self.holder.items():
-            top.append((k, key(v.values)))
+
+            # Select Interval
+            if start in v.index:
+                if end is None:
+                    key_v = key(v.loc[start:])
+                else:
+                    key_v = key(v[start:end])
+            else:
+                key_v = key(v)
+
+            top.append((k, key_v))
+
         top.sort(key=lambda tup: tup[1], reverse=descending)
         return [top[_] for _ in range(n)]
 
@@ -148,34 +159,16 @@ class DataFramesHolder:
         for i in coins:
             self.holder[i] = self.holder[i][cols]
 
-    def __average_interval_return(self, *, coin: str, interval: str) -> np.float64:
-        """
-        Normalize prices and average them
+    def apply(self, coin=None, key=None):
 
-        :param coin: cryptocurrency
-        :param interval: Resample rule  pandas.DataFrame.resample.html#pandas-dataframe-resample
-        :return:
-        """
-        # (1) Normalize prices
-        normalized_prices = ( self[coin] / self[coin].iloc[0] ) - 1
-        # (2) Average results
-        averaged_normalized_prices = normalized_prices.resample(interval).mean()
-        return averaged_normalized_prices
-
-    def average_returns(self, coin=None, interval='D'):
-        """
-        :param coin:
-        :param interval: Downsample with Day (D), X Days (XD), X Minutes (XT)
-        :return:
-        """
         if isinstance(coin, str):
-            return self.__average_interval_return(coin=coin, interval=interval)
+            return key(self[coin])
         elif isinstance(coin, list):
             for k in coin:
-                yield k, self.__average_interval_return(coin=k, interval=interval)
+                yield k, key(self[k])
         elif coin is None:
             for (k, v) in self:
-                yield k, self.__average_interval_return(coin=k, interval=interval)
+                yield k, key(self[k])
         else:
             raise KeyError(f'coin={coin} is not valid')
 
@@ -285,12 +278,25 @@ class DataFramesHolder:
         for k, v in self.holder.items():
             v.rename(columns=dict(zip(v.columns, names)), inplace=True)
 
-    def preprocess(self, mapping):
+    def create_feature(self, name, key):
         for k, v in self.holder.items():
+            v[name] = key(v)
+            self.holder[k] = v
+
+    def preprocess(self, mapping) -> None:
+        raise ValueError('DEPRECATED')
+        # (1) Iterate over coins
+        for k, v in self.holder.items():
+            # (2) Apply preprocessing
             if mapping['func'] == 'mean':
                 v[mapping['output']] = v[mapping['input']].mean(axis=1)
+            elif mapping['func'] == 'multiply':
+                v[mapping['output']] = v[mapping['input'][0]] * v[mapping['input'][1]]
+            elif mapping['func'] == 'identity':
+                v[mapping['output']] = v[mapping['input']]
             else:
                 raise ValueError
+            # (3) Save preprocesses data
             self.holder[k] = v
 
     def pipeline(self, steps):
@@ -408,8 +414,13 @@ class DataFramesHolder:
         plt.show()
 
     def portfolio_value(self, coin_name=list, alloc=list) -> None:
+
+        raise ValueError
         pv = None
         for cn, alloc_val in zip(coin_name, alloc):
+            print(cn)
+            print(alloc)
+            exit(1)
             if pv is None:
                 pv = self.holder[cn] * alloc_val
             else:

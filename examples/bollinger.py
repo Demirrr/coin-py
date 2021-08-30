@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 dfs = cp.DataFramesHolder(path='../Data')
 dfs.select_frames(['BTC'])
-dfs.preprocess({'func': 'mean', 'input': ['open', 'close'], 'output': 'price'})
+dfs.create_feature(name='price', key=lambda dataframe: (dataframe['open'] + dataframe['close']) / 2)
 dfs.select_col(['price'])
 # or dfs.select_interval(start="2021-03-25", end="2021-04-20")
 for i in [2, 3, 5]:

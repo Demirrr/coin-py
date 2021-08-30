@@ -3,8 +3,8 @@ import coinpy as cp
 
 # (1) Load dataframes holding low, high, open, close and volume of coins in 5 minutes interval
 dfs = cp.DataFramesHolder(path='../Data')
-# (2) Drop dataframes having length of less than 120 days
-dfs.drop_data_frames(key=lambda x: len(x) < 12 * 24 * 120)
+# (2) Drop dataframes having length of less than 60 days
+dfs.drop_data_frames(key=lambda x: len(x) < 12 * 24 * 60)
 # (3) Create a feature based on the average value of open and close prices
 dfs.create_feature(name='price', key=lambda df: (df['open'] + df['close']) / 2)
 # (4) Create a feature represent real volume
@@ -24,11 +24,11 @@ def compute_betas():
     Compute Betas on daily returns
     :return:
     """
-    dfs.beta(x='XLM', y='UNI', plot=True)
-    dfs.beta(x='XLM', y='ETH', plot=True)
-    dfs.beta(x='ETH', y='UNI', plot=True)
-    dfs.beta(x='BTC', y='UNI', plot=True)
     dfs.beta(x='BTC', y='ETH', plot=True)
+    dfs.beta(x='BTC', y='ADA', plot=True)
+    dfs.beta(x='BTC', y='DOGE', plot=True)
+    dfs.beta(x='XLM', y='ETH', plot=True)
+    dfs.beta(x='BTC', y='UNI', plot=True)
 
     # To compute all betas
     betas = dfs.beta(interval='D', plot=False)
