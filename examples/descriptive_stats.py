@@ -56,3 +56,53 @@ if flag_correlations:
     for i, (c, info) in enumerate(corr[-10:]):
         print(f'{i + 1}. {info}')
 
+"""
+# OUTPUT
+1.07 BTC + 0.00=ETH
+0.97 BTC + 0.01=ADA
+1.12 BTC -0.01=DOGE
+0.62 XLM + 0.00=ETH
+1.22 BTC + 0.00=UNI
+96.01 USDT + 0.01=MATIC
+81.28 USDT -0.00=MKR
+73.74 USDT + 0.00=GTC
+72.99 USDT -0.01=ICP
+59.94 USDT + 0.00=SUSHI
+52.06 USDT -0.00=TRB
+50.03 USDT -0.00=FIL
+48.81 USDT + 0.00=CHZ
+48.35 USDT + 0.00=CGLD
+46.39 USDT + 0.01=RLC
+XLM : UNI: 0.860
+XLM : ETH: 0.441
+XLM : BTC: 0.726
+ETH : UNI: 0.488
+BTC : UNI: 0.820
+BTC : ETH: 0.080
+
+
+Top 10 positive correlation
+1. BTC : WBTC: 1.000
+2. ZRX : BAT: 0.992
+3. GRT : REN: 0.986
+4. REN : BAT: 0.986
+5. BNT : BAT: 0.985
+6. LTC : TRB: 0.984
+7. BNT : TRB: 0.984
+8. BAND : BAT: 0.984
+9. BCH : TRB: 0.981
+10. NKN : CHZ: 0.980
+
+
+Top 10 negative correlation
+1. MATIC : BAND: -0.543
+2. ETC : NU: -0.547
+3. MATIC : SKL: -0.556
+4. BTC : MATIC: -0.594
+5. MATIC : STORJ: -0.597
+6. MATIC : OXT: -0.602
+7. MATIC : REN: -0.607
+8. MATIC : NU: -0.611
+9. MATIC : WBTC: -0.638
+10. MATIC : GRT: -0.642
+"""
