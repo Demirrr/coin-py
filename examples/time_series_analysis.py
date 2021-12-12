@@ -6,7 +6,16 @@ import torch.nn as nn
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
 
+# https://github.com/omerbsezer/LSTM_RNN_Tutorials_with_Demo/blob/master/StockPricesPredictionProject/pricePredictionLSTM.py
+# https://github.com/stefan-jansen/machine-learning-for-trading
+# https://github.com/mfrdixon/ML_Finance_Codes
+# https://github.com/matplotlib/mplfinance
+# https://farid.one/kaggle-solutions/
+
 df = pd.read_csv('../Data/BTC.csv', parse_dates=['time'])
+
+
+
 # (1) Add price
 df['price'] = (df['open'] + df['close']) / 2
 def price_visualize(data):
