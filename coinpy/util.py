@@ -36,9 +36,9 @@ def plot(data_frame, title='Default'):
 
 def create_experiment_folder(directory):
     if directory is None:
-        directory = os.getcwd() + '/' + 'Data'
+        directory = os.getcwd() + '/' + 'Fetched'
     else:
-        directory += '/' + 'Data'
+        directory += '/' + 'Fetched'
     folder_name = str(datetime.datetime.now())
     path_of_folder = directory + '/' + folder_name
     os.makedirs(path_of_folder)

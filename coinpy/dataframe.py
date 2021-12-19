@@ -86,8 +86,6 @@ class DataFramesHolder:
         self.holder = self.read_csv(coins, path)
         # Test the order
         assert list(self.holder.keys()) == coins
-        print('Drop frames having less than 10 value')
-        self.drop_data_frames(key=lambda x: len(x) < 10)
 
     def __str__(self):
         m = ''

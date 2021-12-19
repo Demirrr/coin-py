@@ -29,7 +29,7 @@ class EventDataset(torch.utils.data.Dataset):
         return torch.Tensor(x), torch.Tensor(y)
 
 class PredictPriceDataset(torch.utils.data.Dataset):
-    def __init__(self, df, seq_length=12,length_next_seq=2):
+    def __init__(self, df, seq_length=12,length_next_seq=1):
         self.data = df.values
         self.seq_length = seq_length
         self.length_next_seq=length_next_seq
