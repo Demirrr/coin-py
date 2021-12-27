@@ -1,4 +1,4 @@
-name: coinpy
+name: coin_demo
 channels:
   - pytorch
   - conda-forge

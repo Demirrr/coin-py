@@ -1,4 +1,3 @@
-from neuralprophet import NeuralProphet
 import numpy as np
 import pandas as pd
 import torch
@@ -59,5 +58,6 @@ for name in ['BTC','ETH','MATIC']:
 
     fig1 = m.plot(forecast)
     plt.title(name)
+    plt.savefig(name)
     plt.show()
 
