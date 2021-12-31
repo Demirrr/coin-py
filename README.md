@@ -7,13 +7,14 @@ git clone https://github.com/Demirrr/coin-py
 conda env create -f environment.yml
 pip install -e .
 ```
-## Returns of few coins 
-![image info](examples/returns.png)
 
-### Analysis on ETH
-![image info](examples/ETH.png)
-### Analysis on MATIC
-![image info](examples/MATIC.png)
+### Analysis on BTC, ETH, and MATIC on every 5 minutes of 2021
+#### Bitcoin USD
+![image info](figures/BTC.png)
+#### Ethereum USD
+![image info](figures/ETH.png)
+#### Polygon USD
+![image info](figures/MATIC.png)
 
 
 # Services
