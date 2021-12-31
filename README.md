@@ -5,6 +5,7 @@ CoinPy is an open-source project for cryptocurrency data acquisition and modelli
 ```bash
 git clone https://github.com/Demirrr/coin-py
 conda env create -f environment.yml
+pip install -e .
 ```
 ## Returns of few coins 
 ![image info](examples/returns.png)
