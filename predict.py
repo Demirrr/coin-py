@@ -1,12 +1,15 @@
 from argparse import ArgumentParser
 from prophet import Prophet
 import pandas as pd
+from prophet.plot import plot_plotly, plot_components_plotly,plot_yearly
+from prophet.plot import add_changepoints_to_plot
 
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
+
 
 # https://github.com/omerbsezer/LSTM_RNN_Tutorials_with_Demo/blob/master/StockPricesPredictionProject/pricePredictionLSTM.py
 # https://github.com/stefan-jansen/machine-learning-for-trading
@@ -49,16 +52,22 @@ def run(args):
         if args.averaging_interval:
             df_daily = df.resample(args.averaging_interval).mean()
         else:
-            df_daily=df
+            df_daily = df
         # (2) Prepare Data : ds:y
         df_daily['ds'] = df_daily.index
         df_daily_prophet = df_daily[['ds', 'y']]
         df_daily_prophet = df_daily_prophet.reset_index()
         df_daily_prophet = df_daily_prophet.drop(columns=['time'])
 
-        m = Prophet()
+        m = Prophet(changepoint_prior_scale=args.changepoint_prior_scale,
+                    interval_width=args.interval_width,
+        mcmc_samples=args.mcmc_samples
+                    )
+        m.add_country_holidays(country_name='US')
         m.fit(df_daily_prophet)
+        # TODO: Adding other time series => https://nbviewer.org/github/nicolasfauchereau/Auckland_Cycling/blob/master/notebooks/Auckland_cycling_and_weather.ipynb
         print(f'Model is trained on {len(df_daily_prophet)} data')
+
         future = m.make_future_dataframe(periods=args.num_preds)
         # Python
         forecast = m.predict(future)
@@ -68,24 +77,38 @@ def run(args):
         #        'multiplicative_terms_lower', 'multiplicative_terms_upper', 'yhat']
         predictions = forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']].tail(args.num_preds)
         if args.save_predictions:
-            predictions.to_csv(f'Pred_'+name + '.csv')
-        m.plot(forecast, figsize=(14, 8), ylabel=f'{name}-price')
+            predictions.to_csv(f'Pred_' + name + '.csv')
+
+        fig = m.plot(forecast,  # figsize=(14, 8),
+                     ylabel=f'{name}-price')
+        plt.title(f'{name}-price')
+
+        if args.add_changepoints_to_plot:
+            a = add_changepoints_to_plot(fig.gca(), m, forecast)
         if args.save_plot:
             plt.savefig(name)
         plt.show()
         if args.plot_component:
-            fig2 = m.plot_components(forecast)
-            plt.title(name + 'Component')
+            fig = m.plot_components(forecast)
             plt.show()
 
 
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument("--averaging_interval", type=str,
-                        default=None,#'D',
-                        help='[D,W,None]')
-    parser.add_argument("--plot_component", default=None)
+                        default='6H',
+                        help='[1H,6H,D,W,M,None]')
+    parser.add_argument("--plot_component", default=False)
     parser.add_argument("--save_plot", default=True)
     parser.add_argument("--save_predictions", default=True)
-    parser.add_argument("--num_preds", type=int,default=50)
+    parser.add_argument("--add_changepoints_to_plot", default=True)
+    parser.add_argument("--num_preds", type=int, default=30)
+    parser.add_argument("--changepoint_prior_scale", type=float, default=0.05,
+                        help='If the trend changes are being overfit (too much flexibility) or underfit (not enough flexibility), you can adjust the strength of the sparse prior using the input argument')
+    parser.add_argument("--interval_width", type=float, default=0.80,
+                        help='')
+    parser.add_argument("--mcmc_samples", type=int, default=0,
+                        help='mcmc_samples: Integer, if greater than 0, will do full Bayesian inference with the specified number of MCMC samples. If 0, will do MAP estimation.')
+
+
     run(parser.parse_args())
