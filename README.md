@@ -9,8 +9,8 @@ pip install -e .
 ```
 
 ## Train & Predict
-See [Plots](Plots) for other crypto cryptocurrency analysis
-![image info](Plots/BTC.png)
+See [figures](figures) for more plots of other crypto cryptocurrencies
+![image info](figures/BTC.png)
 
 # Services
 

@@ -248,7 +248,7 @@ def predict(path, args):
     verif = make_verif(forecast, data_train, data_test)
     plot_verif(verif, args.num_preds)
     plt.title(f'{name} Prediction on avg of {args.averaging_interval} interval')
-    plt.savefig('Plots/' + name)
+    plt.savefig('figures/' + name)
     # plt.show()
     if args.plot_joint:
         plot_joint_plot(verif.iloc[:-args.num_preds, :], title='train set')
@@ -274,7 +274,6 @@ def predict(path, args):
 
 
 def run(args):
-    # @TODO Incorporating the effects of weather conditions
     #  https://nbviewer.org/github/nicolasfauchereau/Auckland_Cycling/blob/master/notebooks/Auckland_cycling_and_weather.ipynb#incorporating-the-effects-of-weather-conditions
     if len(args.main_dataset_path) > 0:
         for p in args.main_dataset_path:
