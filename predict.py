@@ -12,9 +12,11 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import mean_absolute_error as MAE
 import os
+import glob
 
 
 # Study
+# => https://pytorch-forecasting.readthedocs.io/en/stable/index.html
 # => https://github.com/nicolasfauchereau/Auckland_Cycling/blob/master/code/utils.py
 # and https://nbviewer.org/github/nicolasfauchereau/Auckland_Cycling/blob/master/notebooks/Auckland_cycling_and_weather.ipynb
 # https://github.com/omerbsezer/LSTM_RNN_Tutorials_with_Demo/blob/master/StockPricesPredictionProject/pricePredictionLSTM.py
@@ -225,59 +227,81 @@ def plot_joint_plot(verif, x='yhat', y='y', title=None, fpath='../figures/paper'
     #        g.fig.savefig(os.path.join(fpath, "{}.{}".format(fname, ext)), dpi=200)
 
 
-def run(args):
-    # @TODO Incorporating the effects of weather conditions
-    #  https://nbviewer.org/github/nicolasfauchereau/Auckland_Cycling/blob/master/notebooks/Auckland_cycling_and_weather.ipynb#incorporating-the-effects-of-weather-conditions
-    name=args.main_dataset_path.split('/')[1][:-3]
-    df = prepare_data_frame(args.main_dataset_path)
-    df = preprocess_data_frame(df, args)
+def predict(path, args):
+    name = path.split('/')[1][:-4]
+    df = prepare_data_frame(path)
+    try:
+        df = preprocess_data_frame(df, args)
+    except TypeError as e:
+        print(e)
+        return None
     data_train, data_test = data_split(df, args)
-
-    m = fit(data_train, args)
-
+    # Fit the model
+    try:
+        m = fit(data_train, args)
+    except ValueError as e:
+        print(e)
+        return None
+    # Make a prediction
     future = m.make_future_dataframe(periods=args.num_preds, freq=args.averaging_interval)
-    # Python
     forecast = m.predict(future)
     verif = make_verif(forecast, data_train, data_test)
     plot_verif(verif, args.num_preds)
-    plt.title(f'{name} Prediction')
-    plt.show()
+    plt.title(f'{name} Prediction on avg of {args.averaging_interval} interval')
+    plt.savefig('Plots/' + name)
+    # plt.show()
+    if args.plot_joint:
+        plot_joint_plot(verif.iloc[:-args.num_preds, :], title='train set')
+        plt.show()
 
-    plot_joint_plot(verif.iloc[:-args.num_preds, :], title='train set')
-    plt.show()
-
-    plot_joint_plot(verif.iloc[-args.num_preds:, :], title='test set')
-    plt.show()
+        plot_joint_plot(verif.iloc[-args.num_preds:, :], title='test set')
+        plt.show()
     predictions = forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']].tail(args.num_preds)
     if args.save_predictions:
         predictions.to_csv(f'Pred_' + name + '.csv')
 
-    fig = m.plot(forecast,
-                 ylabel=f'{name}-price')
-    plt.title(f'{name}-price')
+    # fig = m.plot(forecast,ylabel=f'{name}-price')
+    # plt.title(f'{name}-price')
 
     if args.add_changepoints_to_plot:
         add_changepoints_to_plot(fig.gca(), m, forecast)
     if args.save_plot:
         plt.savefig(name)
-    plt.show()
+    # plt.show()
     if args.plot_component:
         m.plot_components(forecast)
         plt.show()
 
 
+def run(args):
+    # @TODO Incorporating the effects of weather conditions
+    #  https://nbviewer.org/github/nicolasfauchereau/Auckland_Cycling/blob/master/notebooks/Auckland_cycling_and_weather.ipynb#incorporating-the-effects-of-weather-conditions
+    if len(args.main_dataset_path) > 0:
+        for p in args.main_dataset_path:
+            predict(p, args)
+    else:
+        for p in glob.glob("Data/*.csv"):
+            predict(p, args)
+
+
 if __name__ == '__main__':
     parser = ArgumentParser()
-    parser.add_argument("--main_dataset_path", type=str, default='Data/MATIC.csv', help='Main time series')
-    parser.add_argument("--auxiliary_dataset_path", type=str, default='Data/BTC.csv', help='Auxiliary time series')
+    parser.add_argument("--main_dataset_path",  # name on the CLI - drop the `--` for positional/required parameters
+                        nargs="*",  # 0 or more values expected => creates a list
+                        type=str,
+                        # default=['Data/ETH.csv', 'Data/BTC.csv'],  # default if nothing is provided
+                        default=[],  # If empty, work on all data
+                        )
     parser.add_argument("--averaging_interval", type=str,
                         default='6H',
                         help='[1H,6H,D,W,M,None]')
+
+    parser.add_argument("--plot_joint", default=False)
     parser.add_argument("--plot_component", default=False)
-    parser.add_argument("--save_plot", default=True)
-    parser.add_argument("--save_predictions", default=True)
-    parser.add_argument("--add_changepoints_to_plot", default=True)
-    parser.add_argument("--num_preds", type=int, default=int(4*40))
+    parser.add_argument("--save_plot", default=False)
+    parser.add_argument("--save_predictions", default=False)
+    parser.add_argument("--add_changepoints_to_plot", default=False)
+    parser.add_argument("--num_preds", type=int, default=int(7 * 4))
     parser.add_argument("--changepoint_prior_scale", type=float, default=0.05,
                         help='If the trend changes are being overfit (too much flexibility) or underfit (not enough flexibility), you can adjust the strength of the sparse prior using the input argument')
     parser.add_argument("--interval_width", type=float, default=0.95,

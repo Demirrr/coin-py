@@ -8,33 +8,27 @@ conda env create -f environment.yml
 pip install -e .
 ```
 
-### Analysis on BTC, ETH, and MATIC on every 5 minutes of 2021
-#### Bitcoin USD
-![image info](figures/BTC.png)
-#### Ethereum USD
-![image info](figures/ETH.png)
-#### Polygon USD
-![image info](figures/MATIC.png)
-
+## Train & Predict
+See [Plots](Plots) for other crypto cryptocurrency analysis
+![image info](Plots/BTC.png)
 
 # Services
 
-- [ ] Customizable Notifier
-  - How much did prices and volumes of coins change in the last X hours ?
 - [ ] Trade Assistants
   -  Given a portfolio (total asset and its allocation), how would have a trade assistant suggest in the last X hours
 
 ### In Progress
-
-- [ ] Data Acquisition
-- [ ] Forecasing 
-  - With [Prophet](https://facebook.github.io/prophet/) 
-  - DQL agent
+- [ ] Customizable Notifier
+  - How much did prices and volumes of coins change in the last X hours ?
+  - What to do in next few hours ?
 
 ### Done ✓
 
 - [x] Create fetching coins from Coinbase.
 - [x] Provide information about coins.
-
+- [x] Automatizing Data Acquisition
+- [x] Automatizing Forecasting 
+  - With [Prophet](https://facebook.github.io/prophet/)
+  
 # Help and Support
 For any further questions or suggestions, please contact: caglardemir8@gmail.com
