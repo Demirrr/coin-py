@@ -1,8 +1,8 @@
 name: coin_demo
 channels:
   - pytorch
-  - conda-forge
   - anaconda
+  - conda-forge
   - defaults
 dependencies:
   - _libgcc_mutex=0.1=main
@@ -44,8 +44,6 @@ dependencies:
   - mkl_random=1.1.1=py38h0573a6f_0
   - ncurses=6.2=he6710b0_1
   - ninja=1.10.2=py38hff7bd54_0
-  - numpy=1.19.2=py38h54aff64_0
-  - numpy-base=1.19.2=py38hfa32c7d_0
   - olefile=0.46=py_0
   - openssl=1.1.1h=h7b6447c_0
   - pandas=1.1.3=py38he6710b0_0
@@ -73,38 +71,59 @@ dependencies:
   - torchvision=0.8.2=py38_cu102
   - tornado=6.1=py38h25fe258_0
   - typing_extensions=3.7.4.3=pyha847dfd_0
-  - wheel=0.36.2=pyhd3eb1b0_0
   - xorg-libxau=1.0.9=h14c3975_0
   - xorg-libxdmcp=1.1.3=h516909a_0
   - xz=5.2.5=h7b6447c_0
   - zlib=1.2.11=h7b6447c_3
   - zstd=1.4.5=h9ceee32_0
   - pip:
+    - attrs==22.1.0
     - ax-platform==0.1.20
     - botorch==0.4.0
     - cbpro==1.1.4
     - chardet==4.0.0
     - cloudpickle==1.6.0
+    - cmdstanpy==1.0.4
     - coinbase==2.1.0
+    - convertdate==2.4.0
+    - cython==0.29.32
+    - ephem==4.1.3
     - future==0.18.2
     - gpytorch==1.4.0
     - gym==0.18.0
+    - hijri-converter==2.2.4
+    - holidays==0.14.2
     - idna==2.10
+    - iniconfig==1.1.1
     - jinja2==2.11.3
     - joblib==1.0.1
+    - korean-lunar-calendar==0.2.1
+    - lunarcalendar==0.0.9
     - markupsafe==1.1.1
+    - numpy==1.23.1
+    - packaging==21.3
     - pillow==7.2.0
     - plotly==4.14.3
+    - pluggy==1.0.0
+    - prophet==1.1
+    - py==1.11.0
     - pycryptodome==3.10.1
     - pyglet==1.5.0
+    - pymeeus==0.5.11
     - pymongo==3.5.1
+    - pytest==7.1.2
     - requests==2.13.0
     - retrying==1.3.3
     - scikit-learn==0.24.1
+    - setuptools-git==1.2
     - six==1.10.0
     - sortedcontainers==2.3.0
     - threadpoolctl==2.1.0
+    - tomli==2.0.1
+    - tqdm==4.64.0
     - typeguard==2.11.1
+    - ujson==5.4.0
     - urllib3==1.26.3
     - websocket-client==0.40.0
-prefix: /home/demir/anaconda3/envs/coinpy
+    - wheel==0.37.1
+prefix: /home/demir/anaconda3/envs/coin_demo

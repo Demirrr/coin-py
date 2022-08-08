@@ -288,14 +288,16 @@ if __name__ == '__main__':
     parser.add_argument("--main_dataset_path",  # name on the CLI - drop the `--` for positional/required parameters
                         nargs="*",  # 0 or more values expected => creates a list
                         type=str,
-                        # default=['Data/ETH.csv', 'Data/BTC.csv'],  # default if nothing is provided
-                        default=[],  # If empty, work on all data
+                        default=['Data/ETH.csv', 'Data/BTC.csv', 'Data/SOL.csv', 'Data/AVAX.csv',
+                                 'Data/MATIC.csv', 'Data/ATOM.csv', 'Data/MANA.csv', 'Data/AXS.csv',
+                                 'Data/GALA.csv', 'Data/LRC.csv'],  # default if nothing is provided
+                        # default=[],  # If empty, work on all data
                         )
     parser.add_argument("--averaging_interval", type=str,
                         default='6H',
                         help='[1H,6H,D,W,M,None]')
 
-    parser.add_argument("--plot_joint", default=False)
+    parser.add_argument("--plot_joint", default=True)
     parser.add_argument("--plot_component", default=False)
     parser.add_argument("--save_plot", default=False)
     parser.add_argument("--save_predictions", default=False)
